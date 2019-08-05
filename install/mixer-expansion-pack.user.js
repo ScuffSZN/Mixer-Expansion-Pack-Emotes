@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mixer Expansion Pack
 // @namespace    http://scuffed.dev/Mixer-Expansion-Pack-Emotes
-// @version      0.5
+// @version      0.6
 // @description  Emote packs for Mixer Expansion Pack.
 // @author       ScuffedDev
 // @match        https://mixer.com/*
