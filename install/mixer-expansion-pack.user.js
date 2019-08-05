@@ -4,7 +4,7 @@
 // @version      0.5
 // @description  Emote packs for Mixer Expansion Pack.
 // @author       ScuffedDev
-// @match        https://mixer.com/scuffeddev
+// @match        https://mixer.com/*
 // @grant        none
 // ==/UserScript==
 
