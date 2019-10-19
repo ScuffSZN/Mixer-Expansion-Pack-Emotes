@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mixer Expansion Pack
 // @namespace    http://scuffed.dev/Mixer-Expansion-Pack-Emotes
-// @version      0.6
+// @version      1.8
 // @description  Emote packs for Mixer Expansion Pack.
 // @author       ScuffedDev
 // @match        https://mixer.com/*
@@ -362,8 +362,11 @@
         document.querySelector('textarea').onkeydown = (event) => {
 
             if (event.key == 'Tab') {
-                console.log('Tab')
                 event.preventDefault();
+                var wordStart = document.querySelector('textarea').value.substring(0, document.querySelector('textarea').selectionStart).lastIndexOf(" ") + 1,
+                wordEnd = document.querySelector('textarea').selectionStart + 1;
+                document.querySelector('textarea').value = `${document.querySelector('textarea').value.replaceBetween(wordStart, wordEnd, quickSelect.querySelectorAll('*')[0].innerText)} `;
+                wordEnd = document.querySelector('textarea').selectionStart + 1;
             }
             keyHandel(event)
         }
