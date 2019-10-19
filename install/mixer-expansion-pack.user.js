@@ -9,34 +9,32 @@
 // ==/UserScript==
 
 (function () {
-    console.info('[MEP] Starting')
-    
-    Element.prototype.remove = function () {
-        this.parentElement.removeChild(this);
-    }
-    NodeList.prototype.remove = HTMLCollection.prototype.remove = function () {
-        for (var i = this.length - 1; i >= 0; i--) {
-            if (this[i] && this[i].parentElement) {
-                this[i].parentElement.removeChild(this[i]);
+    let config = {
+        "exPacks": {
+            "TwitchtvGlobalEmotes": {
+                "packName": "Twitch.tv Global Emotes",
+                "channel": "all",
+                "emotes": "https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/twitchGlobal.json",
+                "enabled": true,
+                "error": false
+            },
+            "IcePoseidonChannelEmotes": {
+                "packName": "Ice Poseidon Channel Emotes",
+                "channel": "ice-poseidon",
+                "emotes": "https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/ice-poseidon.json",
+                "enabled": true,
+                "error": false
             }
+
         }
     }
-    
-    String.prototype.replaceBetween = function (start, end, what) {
-        return this.substring(0, start) + what + this.substring(end);
-    };
-    
-    String.prototype.splice = function (idx, rem, str) {
-        return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
-    };
-    
-    
+
     var settings = {
         'emotes': true,
         'avatar': false,
         'colors': true
     }
-    
+
     let emotes = new Map();
     let packs = {}
     const colors = {
@@ -66,7 +64,7 @@
         'X': '00bcd4',
         'Y': '009688',
         'Z': '4caf50',
-    
+
         'a': '8bc34a',
         'b': 'cddc39',
         'c': 'ffeb3b',
@@ -93,7 +91,7 @@
         'x': 'e91e63',
         'y': '9c27b0',
         'z': '673ab7',
-    
+
         '0': '536dfe',
         '1': '2196f3',
         '2': '03a9f4',
@@ -107,45 +105,10 @@
         '-': 'ff9800',
         '_': 'ff5722',
     }
-    
-    let quickSelect = document.createElement('div');
-    
-    let emoteSelector = document.createElement('div');
-    emoteSelector.classList.add('emoteSelector');
-    
-    let emoteSelectorBackdrop = document.createElement('div');
-    emoteSelectorBackdrop.classList.add('emoteSelectorBackdrop');
-    emoteSelectorBackdrop.onclick = (e) => {
-        emoteSelector.style.display = 'none'
-        emoteSelectorBackdrop.style.display = 'none';
-    }
-    
-    var closeSelector = document.createElement('div');
-    closeSelector.classList.add('closeSelector');
-    closeSelector.onclick = (e) => {
-        emoteSelector.style.display = 'none'
-        emoteSelectorBackdrop.style.display = 'none';
-    }
-    emoteSelector.append(closeSelector)
-    
-    var emoteSelectorList = document.createElement('div');
-    emoteSelectorList.classList.add('emoteSelectorList');
-    emoteSelector.append(emoteSelectorList);
-    
-    
-    let init_timer = setInterval(() => {
-        if (document.querySelector('*[class^="scrollWrapper__"]')) {
-            init();
-            clearInterval(init_timer)
-        }
-    }, 1000)
-    
-    let init = () => {
-    
-        console.info('[MEP] Initiated')
-        setupPicker();
-        setupEmoteSelector();
-        let css = `*[class^="message__"], div[class^="wrapper__"] div[class^="container_"],*[class^="backdrop_"]{ display: none; } 
+
+    let css = `
+@include url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
+*[class^="message__"], div[class^="wrapper__"] div[class^="container_"]{ display: none; }
             .emoteQuickSelect {
                 position: absolute;
                 bottom: 49px;
@@ -168,10 +131,10 @@
                 cursor:pointer;
             }
             .emoteQuickSelectName:hover {
-                background-color: #171e29;
+                background-color: #323d4b;
             }
             .emoteQuickSelectNameActive {
-                background-color: #171e29;
+                background-color: #323d4b;
             }
             .emoteSelectorBackdrop {
                 position: absolute;
@@ -228,130 +191,157 @@
             .closeSelector:before {
                 content: "\\E409";
             }
+            .material-icons-round {
+                color: #fff;
+                padding: 5px 0px;
+                cursor: pointer;
+            }
             `,
-            head = document.head || document.getElementsByTagName('head')[0],
-            style = document.createElement('style');
-        style.type = 'text/css';
-        if (style.styleSheet) {
-            style.styleSheet.cssText = css;
-        } else {
-            style.appendChild(document.createTextNode(css));
+
+        head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style');
+    style.type = 'text/css';
+    if (style.styleSheet) {
+        style.styleSheet.cssText = css;
+    } else {
+        style.appendChild(document.createTextNode(css));
+    }
+    head.appendChild(style);
+
+
+    var materialLink = document.createElement("link");
+    materialLink.type = "text/css";
+    materialLink.rel = "stylesheet";
+    materialLink.href = 'https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Sharp|Material+Icons+Round|Material+Icons+Two+Tone';
+
+    head.appendChild(materialLink);
+
+    //https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Sharp|Material+Icons+Round|Material+Icons+Two+Tone
+
+    Element.prototype.remove = function () {
+        this.parentElement.removeChild(this);
+    }
+    NodeList.prototype.remove = HTMLCollection.prototype.remove = function () {
+        for (var i = this.length - 1; i >= 0; i--) {
+            if (this[i] && this[i].parentElement) {
+                this[i].parentElement.removeChild(this[i]);
+            }
         }
-        head.appendChild(style);
-    
-        quickSelect.classList.add('emoteQuickSelect')
-        document.querySelector('.chat-container').append(quickSelect)
-    
+    }
+
+    String.prototype.replaceBetween = function (start, end, what) {
+        return this.substring(0, start) + what + this.substring(end);
+    };
+
+    String.prototype.splice = function (idx, rem, str) {
+        return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+    };
+
+    var quickSelect = document.createElement('div');
+    quickSelect.classList.add('emoteQuickSelect');
+
+    let messageEvent = document.createEvent('Event');
+    messageEvent.initEvent('message', true, true);
+
+    let emoteSelector = document.createElement('div');
+    emoteSelector.classList.add('emoteSelector');
+
+    let emoteSelectorBackdrop = document.createElement('div');
+    emoteSelectorBackdrop.classList.add('emoteSelectorBackdrop');
+    emoteSelectorBackdrop.onclick = (e) => {
+        emoteSelector.style.display = 'none'
+        emoteSelectorBackdrop.style.display = 'none';
+    }
+
+    var closeSelector = document.createElement('div');
+    closeSelector.classList.add('closeSelector');
+    closeSelector.onclick = (e) => {
+        emoteSelector.style.display = 'none'
+        emoteSelectorBackdrop.style.display = 'none';
+    }
+    emoteSelector.append(closeSelector)
+
+    var emoteSelectorList = document.createElement('div');
+    emoteSelectorList.classList.add('emoteSelectorList');
+    emoteSelector.append(emoteSelectorList)
+
+    /**** SETUP ****/
+    var currentLocation = location.href,
+        locationChangeListener = setInterval(() => {
+            if (currentLocation != location.href)
+                init();
+            currentLocation = location.href;
+        }, 500)
+
+    var init = () => {
+        console.info('[MEP] Initiated');
+        var init_timer = setInterval(() => {
+            if (document.querySelector('*[class^="scrollWrapper__"]')) {
+                setUp();
+                setupPicker();
+                setupEmoteSelector();
+                document.querySelector('.chat-container').append(quickSelect)
+                clearInterval(init_timer)
+            }
+        }, 1000)
+    }
+
+    var setUp = () => {
         console.info('[MEP] Setup Message Handeler')
         document.querySelector('*[class^="scrollWrapper__"]').addEventListener('DOMNodeInserted', (e) => {
-            var messageClean = "";
-            var messageRaw = "";
             if (e.target.classList !== undefined) {
-    
                 if ((e.target.classList.value.includes('message__')) && (e.target.classList.value.includes('clickable__'))) {
-    
-                    e.target.style.display = 'none';
-                    e.target.querySelectorAll('span:not(*[class^="message__"]):not(*[class^="Username__"])').forEach((el) => {
-                        if (el.classList.length == 0) {
-                            messageRaw += el.innerText;
-                            messageClean += el.innerText;
-                        }
-                        if (el.classList.length > 0)
-                            if (el.classList[0].includes("Emote"))
-                                messageRaw += `<span class="Emote__1O22q emote__23Wl7" style='${el.getAttribute('style')}'></span>`
-    
-                        if (el.classList.length > 0)
-                            if (el.classList[0].includes("Emote"))
-                                messageClean += `:${el.getAttribute('aria-label')}`
-    
-                        el.remove();
-                    });
-    
-                    messageHandeler({
-                        "username": event.target.querySelector('*[class^="Username__"]').innerText,
-                        "message_raw": messageRaw,
-                        "message_clean": messageClean
-                    }, e.target)
-    
+                    e.target.dispatchEvent(messageEvent);
                 }
             }
-        }, false);
-    }
-    
-    
-    let setupEmoteSelector = () => {
-        console.info('[MEP] Setting Up Emote Selector')
-        emoteSelector.style.display = 'none';
-        emoteSelectorBackdrop.style.display = 'none';
-        document.querySelector('.chat-container').append(emoteSelector);
-        document.querySelector('.chat-container').append(emoteSelectorBackdrop)
-    
-        var toggle = document.querySelector('[aria-label="Emotes menu"]');
-        toggle.onclick = (e) => {
-            e.preventDefault();
-            if (emoteSelector.style.display == 'none') {
-                emoteSelector.style.display = 'block';
-                emoteSelectorBackdrop.style.display = 'block';
-            } else {
-                emoteSelector.style.display = 'none';
-                emoteSelectorBackdrop.style.display = 'none';
-            }
-        }
-    }
-    
-    
-    let updateEmoteSelector = (pack) => {
-        emoteSelectorList.innerHTML = '';
-        var packList = Object.keys(pack);
-        packList.sort(function (a, b) {
-            return a.toLowerCase().localeCompare(b.toLowerCase());
         });
-        packList.forEach((p, j) => {
-            var section = document.createElement('div');
-            section.classList.add('emoteSection');
-    
-            var title = document.createElement('div');
-            title.innerText = packs[p].packName;
-            section.append(title);
-    
-            var emoteSection = document.createElement('div')
-    
-            var emote = packs[p].emotes;
-            var emoteKeys = Object.keys(emote);
-            emoteKeys.sort(function (a, b) {
-                return a.toLowerCase().localeCompare(b.toLowerCase());
-            });
-            emoteKeys.forEach((e, i) => {
-                emoteImg = document.createElement('img')
-                emoteImg.src = emote[e];
-                emoteImg.classList = e;
-                emoteImg.onclick = () => {
-                    //document.querySelector('textarea').selectionStart
-                    document.querySelector('textarea').value = document.querySelector('textarea').value.splice(document.querySelector('textarea').selectionStart, 0, `${e} `);
-                }
-                emoteSection.append(emoteImg);
-            })
-            section.append(emoteSection)
-            emoteSelectorList.append(section);
-        })
+
     }
-    
-    
+    init();
+
+    /**** MESSAGE HANDELER ****/
+    window.addEventListener('message', function (e) {
+        var messageClean = "";
+        var messageRaw = "";
+
+        e.target.querySelectorAll('span:not(*[class^="message__"]):not(*[class^="Username__"]):not(*[class^="badge_"])').forEach((el) => {
+            if (el.classList.length == 0) {
+                messageRaw += el.innerText;
+                messageClean += el.innerText;
+            }
+            if (el.classList.length > 0)
+                if (el.classList[0].includes("Emote"))
+                    messageRaw += `<span class="Emote__1O22q emote__23Wl7" style='${el.getAttribute('style')}'></span>`
+
+            if (el.classList.length > 0)
+                if (el.classList[0].includes("Emote"))
+                    messageClean += `:${el.getAttribute('aria-label')}`
+
+            el.remove();
+        });
+
+        messageHandeler({
+            "username": event.target.querySelector('*[class^="Username__"]').innerText,
+            "message_raw": messageRaw,
+            "message_clean": messageClean
+        }, e.target)
+    }, false);
+
     let messageHandeler = (j, e) => {
-    
+
         e.querySelector('*[class^="messageContent_"]').innerHTML += messageParser(j.message_raw);
-    
+
         if (settings.colors)
             e.querySelector('*[class^="Username__"]').style.color = `#${colors[j.username.charAt(0)]}`;
-    
+
         if (!settings.avatar && e.querySelector('*[class^="ChatAvatar__"]')) {
             e.querySelector('*[class^="ChatAvatar__"]').style.display = 'none';
             e.querySelector('*[class^="messageContent_"]').style.marginLeft = '8px';
         }
-    
+
         e.style.display = 'block';
     }
-    
+
     let messageParser = (m) => {
         var words = m.split(" ");
         var message = "";
@@ -363,11 +353,14 @@
         })
         return message
     }
-    
+
+
+
+    /**** Quick Select ****/
     let setupPicker = () => {
         console.info('[MEP] Setup Quick Picker')
         document.querySelector('textarea').onkeydown = (event) => {
-    
+
             if (event.key == 'Tab') {
                 console.log('Tab')
                 event.preventDefault();
@@ -378,17 +371,17 @@
             keyHandel(event)
         }
     }
-    
+
     var search = (e) => {
         return [...emotes.keys()].filter(function (el) {
             return el.includes(e)
         })
     }
     var keyHandel = (event) => {
-    
+
         var wordStart = document.querySelector('textarea').value.substring(0, document.querySelector('textarea').selectionStart).lastIndexOf(" ") + 1,
             wordEnd = document.querySelector('textarea').selectionStart + 1;
-    
+
         var word = document.querySelector('textarea').value.substring(wordStart, wordEnd);
         if (event.key == 'enter' || document.querySelector('textarea').value === "") {
             quickSelect.innerHTML = '';
@@ -397,7 +390,7 @@
             search(word.toLowerCase()).forEach((e, i) => {
                 if (i > 5)
                     return true
-    
+
                 var selectEmote = document.createElement('div');
                 selectEmote.classList.add('emoteQuickSelectName');
                 if (i == 0)
@@ -406,41 +399,108 @@
                 selectEmote.onclick = function () {
                     document.querySelector('textarea').value = `${document.querySelector('textarea').value.replaceBetween(wordStart, wordEnd, e)} `;
                     wordEnd = document.querySelector('textarea').selectionStart + 1;
+                    quickSelect.style.bottom = `${document.querySelector('div[class^="webComposerBlock__"]').offsetHeight}px`;
                 }
-                quickSelect.append(selectEmote)
+                quickSelect.append(selectEmote);
+                quickSelect.style.bottom = `${document.querySelector('div[class^="webComposerBlock__"]').offsetHeight}px`;
             });
         }
     }
-    
+
+
+    /**** EMOTE SELECTOR ****/
+
+    var setupEmoteSelector = () => {
+        console.info('[MEP] Setting Up Emote Selector');
+        document.querySelector('[aria-label="Emotes menu"]').style.display = 'none'
+        emoteSelector.style.display = 'none';
+        emoteSelectorBackdrop.style.display = 'none';
+        document.querySelector('.chat-container').append(emoteSelector);
+        document.querySelector('.chat-container').append(emoteSelectorBackdrop);
+
+        var toggle = document.createElement('i')
+        toggle.classList.add('material-icons-round')
+        toggle.innerHTML = 'emoji_emotions';
+        document.querySelector('[aria-owns="chat-listbox"]').append(toggle)
+
+        toggle.onclick = (e) => {
+            if (emoteSelector.style.display == 'none') {
+                emoteSelector.style.display = 'block';
+                emoteSelectorBackdrop.style.display = 'block';
+            } else {
+                emoteSelector.style.display = 'none';
+                emoteSelectorBackdrop.style.display = 'none';
+            }
+        }
+    }
+
+    var emoteRenderer = () => {
+        // console.log(packs)
+
+
+        emoteSelectorList.innerHTML = '';
+        var packList = Object.keys(packs);
+        packList.sort(function (a, b) {
+            return a.toLowerCase().localeCompare(b.toLowerCase());
+        });
+        packList.forEach((p, j) => {
+            // console.log(p, j)
+            // console.log(packs[p].packName)
+
+            var emoteSection = document.createElement('div')
+
+            var emote = packs[p].emotes;
+            var emoteKeys = Object.keys(emote);
+
+            emoteKeys.sort(function (a, b) {
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            });
+
+            emoteKeys.forEach((e, i) => {
+                emoteImg = document.createElement('img')
+                emoteImg.src = emote[e];
+                emoteImg.classList = e;
+                emoteImg.onclick = () => {
+                    //document.querySelector('textarea').selectionStart
+                    document.querySelector('textarea').value = document.querySelector('textarea').value.splice(document.querySelector('textarea').selectionStart, 0, `${e} `);
+                }
+                emoteSection.append(emoteImg);
+            })
+
+            var selectorSection = document.createElement('div');
+            selectorSection.classList.add('emoteSection');
+
+            var title = document.createElement('div');
+            title.innerText = packs[p].packName;
+            selectorSection.append(title);
+            // console.log(selectorSection)
+            selectorSection.append(emoteSection);
+            // console.log(selectorSection)
+            emoteSelectorList.append(selectorSection);
+        })
+    }
+
+
+    /**** EMOTES LOADER ****/
+
     let emoteManager = (p) => {
         var emote = p.emotes;
         var emoteKeys = Object.keys(emote);
-    
+
         emoteKeys.forEach((e, i) => {
             emotes.set((e.toLowerCase()), emote[e])
         })
-    
+
         p.enabled = true;
         packs[(p.packName).replace(/[^a-zA-Z1-9]/g, '')] = p;
-        updateEmoteSelector(packs)
-    
+        //updateEmoteSelector(packs)
+        emoteRenderer(packs);
+
+
+
         console.info(`[MEP] Added ${p.packName}`)
     }
-    
-    fetch('https://api.betterttv.net/emotes')
-        .then((r) => {
-            return r.json();
-        })
-        .then(function (j) {
-            j.emotes.forEach((y) => {
-                emotes.set((y.regex).toLowerCase(), y.url)
-            })
-        });
-    
-    
-    var userPacks = ['https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/twitchGlobal.json', 'https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/ice-poseidon.json', 'https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/ninja.json', 'https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/testPack.json', 'https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/at-pack.json']
-    
-    
+
     fetch('https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/twitchGlobal.json')
         .then((r) => {
             return r.json();
@@ -448,8 +508,8 @@
         .then(function (j) {
             emoteManager(j)
         });
-    
-    
+
+
     fetch('https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/ice-poseidon.json')
         .then((r) => {
             return r.json();
@@ -457,7 +517,7 @@
         .then(function (j) {
             emoteManager(j)
         });
-    
+
     fetch('https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/ninja.json')
         .then((r) => {
             return r.json();
@@ -472,7 +532,7 @@
         .then(function (j) {
             emoteManager(j)
         });
-    
+
     fetch('https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/peepo-pack.json')
         .then((r) => {
             return r.json();
@@ -480,7 +540,7 @@
         .then(function (j) {
             emoteManager(j)
         });
-    
+
     fetch('https://scuffed.dev/Mixer-Expansion-Pack-Emotes/emotes/at-pack.json')
         .then((r) => {
             return r.json();
@@ -488,4 +548,4 @@
         .then(function (j) {
             emoteManager(j);
         });
-    })();
+})();
